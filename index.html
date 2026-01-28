@@ -221,16 +221,16 @@ button:disabled {
     <div class="sparkle" style="animation-delay: 1s; left: 70%; top: 10%;"></div>
   </div>
 
-<div class="stats cute-font">
-  <div class="title">Title: <span id="title">Novice Hunter</span></div>
-  <p>Moths hunted: <span id="bugCount">0</span> 🦋</p>
-  <div>
-    <span>Level:</span> <span class="levelIcon" id="level">1</span>
-    <div id="xpBarContainer">
-      <div id="xpBar"></div>
+  <div class="stats cute-font">
+    <p>Moths hunted: <span id="mothCount">0</span> 🦋</p>
+    <div>
+      <span>Level:</span> <span class="levelIcon" id="level">1</span>
+      <div id="xpBarContainer">
+        <div id="xpBar"></div>
+      </div>
     </div>
+    <div class="title">Title: <span id="title">Novice Hunter</span></div>
   </div>
-</div>
 
   <div>
     <button id="addMothBtn" disabled>+1 Moth</button>
@@ -269,7 +269,7 @@ let state = { mothCount: 0, xp: 0, level: 1, hunts: [] };
 let isAdmin = false;
 
 const trophyMilestones = [
-  { count: 1, icon: "🎯", trophy: "First Catch", title: "L Plater" },
+  { count: 1, icon: "🩸", trophy: "First Catch", title: "L Plater" },
   { count: 5, icon: "👀", trophy: "Look at Me Mum!", title: "P Plater" },
   { count: 10, icon: "🔟", trophy: "La Decima", title: "Work Experience Kid" },
   { count: 20, icon: "💼", trophy: "It's a Living", title: "Low Level Salaryman" },
@@ -356,5 +356,3 @@ document.getElementById("resetMothBtn").addEventListener("click", resetMoths);
 </script>
 </body>
 </html>
-
-
