@@ -7,24 +7,26 @@
 <style>
 body { 
   font-family: 'Segoe UI', sans-serif; 
-  background: #e0e0e0; /* slightly darker outside trophies */
+  background: #1a237e; /* dark navy outside trophies */
   margin: 0; 
   padding: 0; 
   display: flex; 
   justify-content: center; 
   align-items: flex-start; 
   min-height: 100vh;
+  color: white;
 }
 
 .frame {
   background: white;
   border-radius: 15px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   padding: 30px;
   margin: 20px;
   max-width: 500px;
   width: 100%;
   text-align: center;
+  color: black;
 }
 
 img { 
@@ -88,6 +90,7 @@ button:disabled {
 .trophies-frame li {
   padding: 3px 0;
   display: block;
+  white-space: nowrap; /* prevent line breaks */
 }
 
 .trophies-frame li.earned { 
@@ -103,6 +106,13 @@ button:disabled {
   25% { transform: scale(1.05) rotate(2deg); text-shadow: 0 0 6px gold, 0 0 10px #fff; }
   50% { transform: scale(1.1) rotate(-2deg); text-shadow: 0 0 8px gold, 0 0 12px #fff; }
   75% { transform: scale(1.05) rotate(2deg); text-shadow: 0 0 6px gold, 0 0 10px #fff; }
+}
+
+/* Force 50th trophy to start in second column */
+.trophies-frame li:nth-child(8) {
+  break-inside: avoid-column;
+  page-break-inside: avoid;
+  column-break-inside: avoid;
 }
 </style>
 
@@ -248,7 +258,7 @@ function renderTrophies() {
   const trophyList = document.getElementById("trophyList");
   trophyList.innerHTML = "";
 
-  trophyMilestones.forEach(t => {
+  trophyMilestones.forEach((t, i) => {
     const li = document.createElement("li");
     li.textContent = `${t.icon} ${t.trophy} (${t.count})`;
     if (state.mothCount >= t.count) {
