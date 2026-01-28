@@ -221,16 +221,16 @@ button:disabled {
     <div class="sparkle" style="animation-delay: 1s; left: 70%; top: 10%;"></div>
   </div>
 
-  <div class="stats cute-font">
-    <p>Moths hunted: <span id="mothCount">0</span> 🦋</p>
-    <div>
-      <span>Level:</span> <span class="levelIcon" id="level">1</span>
-      <div id="xpBarContainer">
-        <div id="xpBar"></div>
-      </div>
+<div class="stats cute-font">
+  <div class="title">Title: <span id="title">Novice Hunter</span></div>
+  <p>Moths hunted: <span id="bugCount">0</span> 🦋</p>
+  <div>
+    <span>Level:</span> <span class="levelIcon" id="level">1</span>
+    <div id="xpBarContainer">
+      <div id="xpBar"></div>
     </div>
-    <div class="title">Title: <span id="title">Novice Hunter</span></div>
   </div>
+</div>
 
   <div>
     <button id="addMothBtn" disabled>+1 Moth</button>
@@ -356,3 +356,4 @@ document.getElementById("resetMothBtn").addEventListener("click", resetMoths);
 </script>
 </body>
 </html>
+
