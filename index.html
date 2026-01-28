@@ -60,28 +60,30 @@ button:disabled {
 #login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; }
 #login button { padding: 8px 15px; border-radius: 5px; }
 
-.trophies { 
+.trophies {
   margin: 20px auto;
-  text-align: center; /* center section */
+  text-align: center; /* centers the section in the frame */
 }
 .trophies h2 { 
   font-size: 22px; 
   margin-bottom: 10px; 
 }
-.trophies ul { 
-  list-style: none; 
-  padding: 0; 
-  display: inline-block; /* shrink to content for centering */
-  columns: 2; 
-  column-gap: 20px;
+
+.trophies ul {
+  list-style: none;
+  padding: 0;
+  display: inline-block; /* centers list */
+  columns: 2;
+  column-gap: 40px;
+  text-align: left; /* left-align trophies in columns */
 }
-.trophies li { 
-  padding: 5px 0; 
-  font-size: 18px; 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; /* center each trophy */
+
+.trophies li {
+  padding: 5px 0;
+  font-size: 18px;
+  display: block;
 }
+
 .trophies li.earned { 
   color: gold; 
   font-weight: bold; 
@@ -92,7 +94,6 @@ button:disabled {
   transform: scale(1.2);
 }
 
-/* Pop animation for newly earned trophies */
 @keyframes pop {
   0% { transform: scale(0.8); opacity: 0.5; }
   50% { transform: scale(1.3); opacity: 1; }
@@ -157,24 +158,22 @@ const statsRef = doc(db, "stats", "buttons");
 
 let state = { mothCount: 0, xp: 0, level: 1, hunts: [] };
 let isAdmin = false;
-let lastMothCount = 0; // track previous count for trophy animation
+let lastMothCount = 0;
 
-// Trophy milestones with icons and titles
+// Trophy milestones: icon + trophy name + title
 const trophyMilestones = [
-  { count: 1, icon: "🦋", title: "First Catch" },
-  { count: 5, icon: "🐾", title: "Tiny Hunter" },
-  { count: 10, icon: "🏅", title: "Skilled Hunter" },
-  { count: 15, icon: "🎖️", title: "Seasoned Hunter" },
-  { count: 20, icon: "🏆", title: "Expert Hunter" },
-  { count: 25, icon: "🥂", title: "Master Hunter" }, // new 25-moth trophy
-  { count: 30, icon: "🥇", title: "Elite Hunter" },
-  { count: 40, icon: "🥈", title: "Champion" },
-  { count: 50, icon: "🥉", title: "Legend" },
-  { count: 60, icon: "💎", title: "Diamond Hunter" },
-  { count: 70, icon: "👑", title: "Crowned Hunter" },
-  { count: 80, icon: "🔥", title: "Inferno Hunter" },
-  { count: 90, icon: "⚡", title: "Lightning Hunter" },
-  { count: 100, icon: "🌟", title: "Ultimate Moth Slayer" }
+  { count: 1, icon: "🩸", trophy: "First Blood", title: "L Plater" },
+  { count: 5, icon: "👀", trophy: "Look at Me Mum!", title: "P Plater" },
+  { count: 10, icon: "🔟", trophy: "La Decima", title: "Work Experience Kid" },
+  { count: 20, icon: "💼", trophy: "It's a Living", title: "Low Level Salaryman" },
+  { count: 30, icon: "📈", trophy: "Thirty and Thriving", title: "Middle Management" },
+  { count: 40, icon: "☕", trophy: "Caffeine Mandatory", title: "Head of Moth Engagement" },
+  { count: 50, icon: "🏆", trophy: "Half a Century!", title: "Director of Moth Management" },
+  { count: 60, icon: "💼🐱", trophy: "Retirement? Never!", title: "Chief Executive Mofficer" },
+  { count: 70, icon: "🐾", trophy: "Hard at Work", title: "Senior VP of Moth Operations" },
+  { count: 80, icon: "🐱", trophy: "I'm Not a Cat", title: "VP of Pest Control" },
+  { count: 90, icon: "🐐", trophy: "I'm a GOAT", title: "Chief of Feline Strategy" },
+  { count: 100, icon: "💯", trophy: "One Hundred Meows", title: "Supreme Moth Overlord" }
 ];
 
 // Login
@@ -204,16 +203,12 @@ function render() {
   document.getElementById("mothCount").textContent = state.mothCount;
   document.getElementById("xp").textContent = state.xp;
   document.getElementById("level").textContent = state.level;
-  document.getElementById("title").textContent = getTitle(state.level);
-  renderTrophies();
-}
 
-// Assign titles
-function getTitle(level) {
-  if (level >= 10) return "Legendary Moth Slayer";
-  if (level >= 7) return "Expert Hunter";
-  if (level >= 4) return "Skilled Hunter";
-  return "Novice Hunter";
+  // Highest title earned
+  const earned = trophyMilestones.filter(t => state.mothCount >= t.count);
+  document.getElementById("title").textContent = earned.length ? earned[earned.length - 1].title : "Novice Hunter";
+
+  renderTrophies();
 }
 
 // +1 Moth
@@ -255,19 +250,16 @@ async function resetMoths() {
   }
 }
 
-// Trophy rendering with badges, titles, and animation
+// Render trophies
 function renderTrophies() {
   const trophyList = document.getElementById("trophyList");
   trophyList.innerHTML = "";
 
   trophyMilestones.forEach(t => {
     const li = document.createElement("li");
-    li.textContent = `${t.icon} ${t.count} Moth${t.count > 1 ? 's' : ''} - ${t.title}`;
-    li.style.textAlign = "center";
-
+    li.textContent = `${t.icon} ${t.trophy}`;
     if (state.mothCount >= t.count) {
       li.classList.add("earned");
-      // Animate only if newly earned
       if (lastMothCount < t.count) {
         li.classList.add("pop");
         li.addEventListener('animationend', () => li.classList.remove("pop"));
@@ -275,11 +267,10 @@ function renderTrophies() {
     } else {
       li.style.color = "#aaa";
     }
-
     trophyList.appendChild(li);
   });
 
-  lastMothCount = state.mothCount; // update for next render
+  lastMothCount = state.mothCount;
 }
 
 // Real-time updates
@@ -290,11 +281,8 @@ onSnapshot(statsRef, snap => {
   }
 });
 
-// Expose functions globally
 window.addMoth = addMoth;
 window.resetMoths = resetMoths;
-
-// Attach button click handlers
 document.getElementById("addMothBtn").addEventListener("click", addMoth);
 document.getElementById("resetMothBtn").addEventListener("click", resetMoths);
 
