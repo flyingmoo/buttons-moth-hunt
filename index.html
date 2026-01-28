@@ -7,7 +7,7 @@
 <style>
 body { 
   font-family: 'Segoe UI', sans-serif; 
-  background: #f0f0f0; 
+  background: #e0e0e0; /* slightly darker outside trophies */
   margin: 0; 
   padding: 0; 
   display: flex; 
@@ -60,48 +60,49 @@ button:disabled {
 #login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; }
 #login button { padding: 8px 15px; border-radius: 5px; }
 
-.trophies {
-  margin: 20px auto;
-  text-align: center; /* centers the section in the frame */
-}
-.trophies h2 { 
-  font-size: 22px; 
-  margin-bottom: 10px; 
+/* Trophy Section Frame */
+.trophies-frame {
+  background: linear-gradient(145deg, #fff, #f8f8ff);
+  border-radius: 15px;
+  box-shadow: 0 8px 15px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.6);
+  padding: 20px;
+  margin-top: 30px;
 }
 
-.trophies ul {
+.trophies-frame h2 { 
+  font-size: 22px; 
+  margin-bottom: 15px; 
+  text-shadow: 1px 1px 2px #ccc;
+}
+
+.trophies-frame ul {
   list-style: none;
   padding: 0;
   display: inline-block; /* centers list */
   columns: 2;
   column-gap: 40px;
   text-align: left; /* left-align trophies in columns */
+  font-size: 16px;
 }
 
-.trophies li {
-  padding: 5px 0;
-  font-size: 18px;
+.trophies-frame li {
+  padding: 3px 0;
   display: block;
 }
 
-.trophies li.earned { 
+.trophies-frame li.earned { 
   color: gold; 
   font-weight: bold; 
   transform: scale(1.05);
-  transition: transform 0.2s ease;
-}
-.trophies li.earned:hover {
-  transform: scale(1.2);
+  animation: sparkleLoop 2s infinite;
 }
 
-@keyframes pop {
-  0% { transform: scale(0.8); opacity: 0.5; }
-  50% { transform: scale(1.3); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-.trophies li.pop {
-  animation: pop 0.5s ease forwards;
-  color: gold;
+/* Continuous sparkle animation */
+@keyframes sparkleLoop {
+  0%, 100% { transform: scale(1) rotate(0deg); text-shadow: 0 0 2px gold; }
+  25% { transform: scale(1.05) rotate(2deg); text-shadow: 0 0 6px gold, 0 0 10px #fff; }
+  50% { transform: scale(1.1) rotate(-2deg); text-shadow: 0 0 8px gold, 0 0 12px #fff; }
+  75% { transform: scale(1.05) rotate(2deg); text-shadow: 0 0 6px gold, 0 0 10px #fff; }
 }
 </style>
 
@@ -127,7 +128,7 @@ button:disabled {
     <button id="resetMothBtn" disabled>Reset Moths</button>
   </div>
 
-  <div class="trophies">
+  <div class="trophies-frame">
     <h2>Trophies 🏆</h2>
     <ul id="trophyList"></ul>
   </div>
@@ -158,9 +159,8 @@ const statsRef = doc(db, "stats", "buttons");
 
 let state = { mothCount: 0, xp: 0, level: 1, hunts: [] };
 let isAdmin = false;
-let lastMothCount = 0;
 
-// Trophy milestones: icon + trophy name + title
+// Trophy milestones: icon + trophy name + moth count + title
 const trophyMilestones = [
   { count: 1, icon: "🩸", trophy: "First Blood", title: "L Plater" },
   { count: 5, icon: "👀", trophy: "Look at Me Mum!", title: "P Plater" },
@@ -181,11 +181,9 @@ window.login = async function() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    console.log("Login successful! UID:", userCredential.user.uid);
+    await signInWithEmailAndPassword(auth, email, password);
     alert("Logged in as admin!");
   } catch (err) {
-    console.error("Login failed:", err);
     alert("Login failed: " + err.message);
   }
 };
@@ -218,15 +216,12 @@ async function addMoth() {
     const snap = await getDoc(statsRef);
     if (!snap.exists()) return alert("Firestore document missing!");
     state = snap.data();
-    const now = new Date().toLocaleString();
     state.mothCount++;
-    state.hunts.push(`🦋 ${now}`);
+    state.hunts.push(`🦋 ${new Date().toLocaleString()}`);
     state.xp += 10;
     while (state.xp >= state.level * 50) { state.xp -= state.level * 50; state.level++; }
     await updateDoc(statsRef, state);
-    render();
   } catch (err) {
-    console.error("Failed to add moth:", err);
     alert("Error: " + err.message);
   }
 }
@@ -243,9 +238,7 @@ async function resetMoths() {
     state.level = 1;
     state.hunts = [];
     await updateDoc(statsRef, state);
-    render();
   } catch (err) {
-    console.error("Failed to reset moths:", err);
     alert("Error: " + err.message);
   }
 }
@@ -257,20 +250,14 @@ function renderTrophies() {
 
   trophyMilestones.forEach(t => {
     const li = document.createElement("li");
-    li.textContent = `${t.icon} ${t.trophy}`;
+    li.textContent = `${t.icon} ${t.trophy} (${t.count})`;
     if (state.mothCount >= t.count) {
-      li.classList.add("earned");
-      if (lastMothCount < t.count) {
-        li.classList.add("pop");
-        li.addEventListener('animationend', () => li.classList.remove("pop"));
-      }
+      li.classList.add("earned"); // continuous sparkle
     } else {
       li.style.color = "#aaa";
     }
     trophyList.appendChild(li);
   });
-
-  lastMothCount = state.mothCount;
 }
 
 // Real-time updates
