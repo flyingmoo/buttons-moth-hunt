@@ -7,7 +7,7 @@
 <style>
 body { 
   font-family: 'Segoe UI', sans-serif; 
-  background: #f0f0f0; /* overall page light grey */
+  background: #f0f0f0;
   margin: 0; 
   padding: 0; 
   display: flex; 
@@ -21,10 +21,10 @@ body {
   background: white;
   border-radius: 15px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-  padding: 30px;
+  padding: 20px;
   margin: 20px;
+  width: 90%;
   max-width: 500px;
-  width: 100%;
   text-align: center;
   color: black;
 }
@@ -39,24 +39,26 @@ body {
 }
 
 img { 
-  max-width: 300px; 
+  max-width: 100%; 
+  height: auto;
   border-radius: 10px; 
 }
 
 .stats { 
-  margin: 20px; 
+  margin: 20px 0; 
   font-size: 18px; 
 }
 
 button { 
   font-size: 18px; 
-  padding: 12px 25px; 
+  padding: 12px 20px; 
   margin: 5px; 
   border: none; 
   border-radius: 8px; 
   cursor: pointer; 
   transition: all 0.2s ease; 
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  min-width: 120px;
 }
 button:disabled { 
   opacity: 0.5; 
@@ -67,7 +69,7 @@ button:disabled {
 #resetMothBtn { background: #f44336; color: white; }
 #resetMothBtn:hover:not(:disabled) { background: #e53935; transform: translateY(-2px); }
 
-#login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; }
+#login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; width: 40%; }
 #login button { padding: 8px 15px; border-radius: 5px; }
 
 /* Trophy Section Frame with more accented border */
@@ -78,6 +80,7 @@ button:disabled {
   margin-top: 30px;
   border: 3px solid #ff69b4; /* bright pink border */
   box-shadow: 0 8px 15px rgba(255, 105, 180, 0.4), 0 0 20px rgba(255, 105, 180, 0.6);
+  overflow: hidden;
 }
 
 .trophies-frame h2 { 
@@ -91,9 +94,10 @@ button:disabled {
   padding: 0;
   display: inline-block; /* centers list */
   columns: 2;
-  column-gap: 40px;
+  column-gap: 20px;
   text-align: left; /* left-align trophies in columns */
   font-size: 16px;
+  width: 100%;
 }
 
 .trophies-frame li {
@@ -122,6 +126,23 @@ button:disabled {
   break-inside: avoid-column;
   page-break-inside: avoid;
   column-break-inside: avoid;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 480px) {
+  .trophies-frame ul {
+    columns: 1; /* single column on small screens */
+    column-gap: 0;
+  }
+  #login input {
+    width: 70%;
+    margin: 5px 0;
+  }
+  button {
+    font-size: 16px;
+    min-width: 100px;
+    padding: 10px 15px;
+  }
 }
 </style>
 
@@ -182,7 +203,6 @@ const statsRef = doc(db, "stats", "buttons");
 let state = { mothCount: 0, xp: 0, level: 1, hunts: [] };
 let isAdmin = false;
 
-// Trophy milestones: icon + trophy name + moth count + title
 const trophyMilestones = [
   { count: 1, icon: "🩸", trophy: "First Blood", title: "L Plater" },
   { count: 5, icon: "👀", trophy: "Look at Me Mum!", title: "P Plater" },
@@ -191,14 +211,13 @@ const trophyMilestones = [
   { count: 30, icon: "📈", trophy: "Thirty and Thriving", title: "Middle Management" },
   { count: 40, icon: "☕", trophy: "Caffeine Mandatory", title: "Head of Moth Engagement" },
   { count: 50, icon: "🏆", trophy: "Half a Century!", title: "Director of Moth Management" },
-  { count: 60, icon: "💼🐱", trophy: "Retirement? Never!", title: "Chief Executive Mofficer" },
+  { count: 60, icon: "💼", trophy: "Retirement? Never!", title: "Chief Executive Mofficer" }, // 🐱 removed
   { count: 70, icon: "🐾", trophy: "Hard at Work", title: "Senior VP of Moth Operations" },
   { count: 80, icon: "🐱", trophy: "I'm Not a Cat", title: "VP of Pest Control" },
   { count: 90, icon: "🐐", trophy: "I'm a GOAT", title: "Chief of Feline Strategy" },
   { count: 100, icon: "💯", trophy: "One Hundred Meows", title: "Supreme Moth Overlord" }
 ];
 
-// Login
 window.login = async function() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -210,7 +229,6 @@ window.login = async function() {
   }
 };
 
-// Track auth state
 onAuthStateChanged(auth, user => {
   isAdmin = !!user;
   document.getElementById("addMothBtn").disabled = !isAdmin;
@@ -218,20 +236,17 @@ onAuthStateChanged(auth, user => {
   document.getElementById("login").style.display = isAdmin ? "none" : "block";
 });
 
-// Render stats
 function render() {
   document.getElementById("mothCount").textContent = state.mothCount;
   document.getElementById("xp").textContent = state.xp;
   document.getElementById("level").textContent = state.level;
 
-  // Highest title earned
   const earned = trophyMilestones.filter(t => state.mothCount >= t.count);
   document.getElementById("title").textContent = earned.length ? earned[earned.length - 1].title : "Novice Hunter";
 
   renderTrophies();
 }
 
-// +1 Moth
 async function addMoth() {
   if (!isAdmin) return;
   try {
@@ -243,29 +258,20 @@ async function addMoth() {
     state.xp += 10;
     while (state.xp >= state.level * 50) { state.xp -= state.level * 50; state.level++; }
     await updateDoc(statsRef, state);
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+  } catch (err) { alert("Error: " + err.message); }
 }
 
-// Reset Moths
 async function resetMoths() {
   if (!isAdmin) return;
   try {
     const snap = await getDoc(statsRef);
     if (!snap.exists()) return alert("Firestore document missing!");
     state = snap.data();
-    state.mothCount = 0;
-    state.xp = 0;
-    state.level = 1;
-    state.hunts = [];
+    state.mothCount = 0; state.xp = 0; state.level = 1; state.hunts = [];
     await updateDoc(statsRef, state);
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+  } catch (err) { alert("Error: " + err.message); }
 }
 
-// Render trophies
 function renderTrophies() {
   const trophyList = document.getElementById("trophyList");
   trophyList.innerHTML = "";
@@ -273,21 +279,14 @@ function renderTrophies() {
   trophyMilestones.forEach((t, i) => {
     const li = document.createElement("li");
     li.textContent = `${t.icon} ${t.trophy} (${t.count})`;
-    if (state.mothCount >= t.count) {
-      li.classList.add("earned"); // continuous sparkle
-    } else {
-      li.style.color = "#aaa";
-    }
+    if (state.mothCount >= t.count) li.classList.add("earned");
+    else li.style.color = "#aaa";
     trophyList.appendChild(li);
   });
 }
 
-// Real-time updates
 onSnapshot(statsRef, snap => {
-  if (snap.exists()) {
-    state = snap.data();
-    render();
-  }
+  if (snap.exists()) { state = snap.data(); render(); }
 });
 
 window.addMoth = addMoth;
