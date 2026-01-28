@@ -18,7 +18,7 @@ body {
 }
 
 .frame {
-  background: white;
+  background: #ffc0cb; /* Light pink for entire frame */
   border-radius: 15px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   padding: 20px;
@@ -27,11 +27,11 @@ body {
   max-width: 500px;
   text-align: center;
   color: black;
+  font-weight: bold; /* Bold font for everything inside */
 }
 
-/* Light pink background behind Buttons' image */
 .image-wrapper {
-  background: #ffc0cb; /* light pink */
+  background: #ffc0cb; /* Light pink */
   padding: 15px;
   border-radius: 15px;
   display: inline-block;
@@ -47,6 +47,7 @@ img {
 .stats { 
   margin: 20px 0; 
   font-size: 18px; 
+  font-weight: bold;
 }
 
 button { 
@@ -59,6 +60,7 @@ button {
   transition: all 0.2s ease; 
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   min-width: 120px;
+  font-weight: bold; /* Bold button text */
 }
 button:disabled { 
   opacity: 0.5; 
@@ -69,8 +71,8 @@ button:disabled {
 #resetMothBtn { background: #f44336; color: white; }
 #resetMothBtn:hover:not(:disabled) { background: #e53935; transform: translateY(-2px); }
 
-#login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; width: 40%; }
-#login button { padding: 8px 15px; border-radius: 5px; }
+#login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; width: 40%; font-weight: bold; }
+#login button { padding: 8px 15px; border-radius: 5px; font-weight: bold; }
 
 /* Trophy Section Frame with more accented border */
 .trophies-frame {
@@ -98,6 +100,7 @@ button:disabled {
   text-align: left; /* left-align trophies in columns */
   font-size: 16px;
   width: 100%;
+  font-weight: bold;
 }
 
 .trophies-frame li {
@@ -211,7 +214,7 @@ const trophyMilestones = [
   { count: 30, icon: "📈", trophy: "Thirty and Thriving", title: "Middle Management" },
   { count: 40, icon: "☕", trophy: "Caffeine Mandatory", title: "Head of Moth Engagement" },
   { count: 50, icon: "🏆", trophy: "Half a Century!", title: "Director of Moth Management" },
-  { count: 60, icon: "💼", trophy: "Retirement? Never!", title: "Chief Executive Mofficer" }, // 🐱 removed
+  { count: 60, icon: "💼", trophy: "Retirement? Never!", title: "Chief Executive Mofficer" },
   { count: 70, icon: "🐾", trophy: "Hard at Work", title: "Senior VP of Moth Operations" },
   { count: 80, icon: "🐱", trophy: "I'm Not a Cat", title: "VP of Pest Control" },
   { count: 90, icon: "🐐", trophy: "I'm a GOAT", title: "Chief of Feline Strategy" },
