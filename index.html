@@ -7,14 +7,14 @@
 <style>
 body { 
   font-family: 'Segoe UI', sans-serif; 
-  background: #1a237e; /* dark navy outside trophies */
+  background: #f0f0f0; /* overall page light grey */
   margin: 0; 
   padding: 0; 
   display: flex; 
   justify-content: center; 
   align-items: flex-start; 
   min-height: 100vh;
-  color: white;
+  color: black;
 }
 
 .frame {
@@ -29,10 +29,18 @@ body {
   color: black;
 }
 
+/* Light pink background behind Buttons' image */
+.image-wrapper {
+  background: #ffc0cb; /* light pink */
+  padding: 15px;
+  border-radius: 15px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
 img { 
   max-width: 300px; 
   border-radius: 10px; 
-  margin-bottom: 20px; 
 }
 
 .stats { 
@@ -62,13 +70,14 @@ button:disabled {
 #login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; }
 #login button { padding: 8px 15px; border-radius: 5px; }
 
-/* Trophy Section Frame */
+/* Trophy Section Frame with more accented border */
 .trophies-frame {
   background: linear-gradient(145deg, #fff, #f8f8ff);
   border-radius: 15px;
-  box-shadow: 0 8px 15px rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.6);
   padding: 20px;
   margin-top: 30px;
+  border: 3px solid #ff69b4; /* bright pink border */
+  box-shadow: 0 8px 15px rgba(255, 105, 180, 0.4), 0 0 20px rgba(255, 105, 180, 0.6);
 }
 
 .trophies-frame h2 { 
@@ -124,7 +133,10 @@ button:disabled {
 
 <div class="frame">
   <h1>Buttons Moth Kill Count 🐱</h1>
-  <img src="buttons.jpg" alt="Buttons the Cat">
+
+  <div class="image-wrapper">
+    <img src="buttons.jpg" alt="Buttons the Cat">
+  </div>
 
   <div class="stats">
     <p>Moths hunted: <span id="mothCount">0</span></p>
