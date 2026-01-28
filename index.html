@@ -91,6 +91,17 @@ button:disabled {
 .trophies li.earned:hover {
   transform: scale(1.2);
 }
+
+/* Pop animation for newly earned trophies */
+@keyframes pop {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.trophies li.pop {
+  animation: pop 0.5s ease forwards;
+  color: gold;
+}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
@@ -146,6 +157,7 @@ const statsRef = doc(db, "stats", "buttons");
 
 let state = { mothCount: 0, xp: 0, level: 1, hunts: [] };
 let isAdmin = false;
+let lastMothCount = 0; // track previous count for trophy animation
 
 // Trophy milestones with icons and titles
 const trophyMilestones = [
@@ -243,17 +255,31 @@ async function resetMoths() {
   }
 }
 
-// Trophy rendering with badges and titles
+// Trophy rendering with badges, titles, and animation
 function renderTrophies() {
   const trophyList = document.getElementById("trophyList");
   trophyList.innerHTML = "";
+
   trophyMilestones.forEach(t => {
     const li = document.createElement("li");
     li.textContent = `${t.icon} ${t.count} Moth${t.count > 1 ? 's' : ''} - ${t.title}`;
-    if (state.mothCount >= t.count) li.classList.add("earned");
-    else li.style.color = "#aaa"; 
+    li.style.textAlign = "center";
+
+    if (state.mothCount >= t.count) {
+      li.classList.add("earned");
+      // Animate only if newly earned
+      if (lastMothCount < t.count) {
+        li.classList.add("pop");
+        li.addEventListener('animationend', () => li.classList.remove("pop"));
+      }
+    } else {
+      li.style.color = "#aaa";
+    }
+
     trophyList.appendChild(li);
   });
+
+  lastMothCount = state.mothCount; // update for next render
 }
 
 // Real-time updates
