@@ -61,8 +61,8 @@ button:disabled {
 #login button { padding: 8px 15px; border-radius: 5px; }
 
 .trophies { 
-  margin: 20px auto; 
-  text-align: left; 
+  margin: 20px auto;
+  text-align: center; /* center section */
 }
 .trophies h2 { 
   font-size: 22px; 
@@ -71,14 +71,16 @@ button:disabled {
 .trophies ul { 
   list-style: none; 
   padding: 0; 
+  display: inline-block; /* shrink to content for centering */
   columns: 2; 
   column-gap: 20px;
 }
 .trophies li { 
   padding: 5px 0; 
   font-size: 18px; 
-  display: flex;
-  align-items: center;
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; /* center each trophy */
 }
 .trophies li.earned { 
   color: gold; 
@@ -145,21 +147,22 @@ const statsRef = doc(db, "stats", "buttons");
 let state = { mothCount: 0, xp: 0, level: 1, hunts: [] };
 let isAdmin = false;
 
-// Trophy milestones with icons
+// Trophy milestones with icons and titles
 const trophyMilestones = [
-  { count: 1, icon: "🦋" },
-  { count: 5, icon: "🐾" },
-  { count: 10, icon: "🏅" },
-  { count: 15, icon: "🎖️" },
-  { count: 20, icon: "🏆" },
-  { count: 30, icon: "🥇" },
-  { count: 40, icon: "🥈" },
-  { count: 50, icon: "🥉" },
-  { count: 60, icon: "💎" },
-  { count: 70, icon: "👑" },
-  { count: 80, icon: "🔥" },
-  { count: 90, icon: "⚡" },
-  { count: 100, icon: "🌟" }
+  { count: 1, icon: "🦋", title: "First Catch" },
+  { count: 5, icon: "🐾", title: "Tiny Hunter" },
+  { count: 10, icon: "🏅", title: "Skilled Hunter" },
+  { count: 15, icon: "🎖️", title: "Seasoned Hunter" },
+  { count: 20, icon: "🏆", title: "Expert Hunter" },
+  { count: 25, icon: "🥂", title: "Master Hunter" }, // new 25-moth trophy
+  { count: 30, icon: "🥇", title: "Elite Hunter" },
+  { count: 40, icon: "🥈", title: "Champion" },
+  { count: 50, icon: "🥉", title: "Legend" },
+  { count: 60, icon: "💎", title: "Diamond Hunter" },
+  { count: 70, icon: "👑", title: "Crowned Hunter" },
+  { count: 80, icon: "🔥", title: "Inferno Hunter" },
+  { count: 90, icon: "⚡", title: "Lightning Hunter" },
+  { count: 100, icon: "🌟", title: "Ultimate Moth Slayer" }
 ];
 
 // Login
@@ -240,13 +243,13 @@ async function resetMoths() {
   }
 }
 
-// Trophy rendering with badges
+// Trophy rendering with badges and titles
 function renderTrophies() {
   const trophyList = document.getElementById("trophyList");
   trophyList.innerHTML = "";
   trophyMilestones.forEach(t => {
     const li = document.createElement("li");
-    li.textContent = `${t.icon} ${t.count} Moth${t.count > 1 ? 's' : ''}`;
+    li.textContent = `${t.icon} ${t.count} Moth${t.count > 1 ? 's' : ''} - ${t.title}`;
     if (state.mothCount >= t.count) li.classList.add("earned");
     else li.style.color = "#aaa"; 
     trophyList.appendChild(li);
