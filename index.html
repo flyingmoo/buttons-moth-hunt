@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buttons the Cat - Moth Tracker</title>
+
+<style>
+  body { font-family: sans-serif; text-align: center; background: #f0f0f0; padding: 20px; }
+  img { max-width: 300px; border-radius: 10px; }
+  .stats { margin: 20px; font-size: 18px; }
+  #addMothBtn { font-size: 18px; padding: 10px 20px; }
+  #login input { padding: 5px; margin: 0 5px; }
+</style>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+</head>
+
+<body>
+
+<h1>Buttons the Cat 🐱</h1>
+<img src="buttons.jpg" alt="Buttons the Cat">
+
+<div class="stats">
+  <p>Moths hunted: <span id="mothCount">0</span></p>
+  <p>XP: <span id="xp">0</span></p>
+  <p>Level: <span id="level">1</span></p>
+  <p>Title: <span id="title">Novice Hunter</span></p>
+</div>
+
+<button id="addMothBtn" onclick="addMoth(event)" disabled>+1 Moth</button>
+
+<div id="login" style="margin-top: 20px;">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Admin Login</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔹 Firebase configuration (replace YOUR_... with your actual values)
+const firebaseConfig = {
+  apiKey: "AIzaSyC1HnYKrEwO4uEF1VluSzHnr0EgOUYHhUs",
+  authDomain: "buttons-moth-rpg.firebaseapp.com",
+  projectId: "buttons-moth-rpg"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Reference to Buttons document
+const statsRef = doc(db, "stats", "buttons");
+
+// State object
+let state = {
+  mothCount: 0,
+  xp: 0,
+  level: 1,
+  hunts: []
+};
+
+let isAdmin = false;
+
+// Admin login
+window.login = async function() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    alert("Logged in as admin!");
+  } catch (err) {
+    alert("Login failed: " + err.message);
+  }
+};
+
+// Track login state
+onAuthStateChanged(auth, user => {
+  isAdmin = !!user;
+  document.getElementById("addMothBtn").disabled = !isAdmin;
+  document.getElementById("login").style.display = isAdmin ? "none" : "block";
+});
+
+// Render stats
+function render() {
+  document.getElementById("mothCount").textContent = state.mothCount;
+  document.getElementById("xp").textContent = state.xp;
+  document.getElementById("level").textContent = state.level;
+  document.getElementById("title").textContent = getTitle(state.level);
+}
+
+// Assign titles based on level
+function getTitle(level) {
+  if (level >= 10) return "Legendary Moth Slayer";
+  if (level >= 7) return "Expert Hunter";
+  if (level >= 4) return "Skilled Hunter";
+  return "Novice Hunter";
+}
+
+// +1 Moth button
+async function addMoth(event) {
+  if (!isAdmin) return;
+  const now = new Date().toLocaleString();
+  state.mothCount++;
+  state.hunts.push(`🦋 ${now}`);
+  state.xp += 10;
+  while (state.xp >= state.level * 50) {
+    state.xp -= state.level * 50;
+    state.level++;
+  }
+  await updateDoc(statsRef, state);
+  render();
+}
+
+// Optional paw animation
+function spawnPaw(x, y) {
+  const paw = document.createElement("div");
+  paw.textContent = "🐾";
+  paw.style.position = "absolute";
+  paw.style.left = x + "px";
+  paw.style.top = y + "px";
+  paw.style.fontSize = "24px";
+  document.body.appendChild(paw);
+  setTimeout(() => paw.remove(), 1000);
+}
+
+// Real-time listener
+onSnapshot(statsRef, snap => {
+  if (snap.exists()) {
+    state = snap.data();
+    render();
+  }
+});
+
+</script>
+
+</body>
+</html>
