@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Buttons Debug Tracker</title>
+<title>Buttons Moth Tracker</title>
 <style>
 body { font-family: sans-serif; text-align: center; padding: 20px; background: #f0f0f0; }
 img { max-width: 300px; border-radius: 10px; }
 .stats { margin: 20px; font-size: 18px; }
-#addMothBtn { font-size: 18px; padding: 10px 20px; }
+button { font-size: 18px; padding: 10px 20px; margin: 5px; }
 #login input { padding: 5px; margin: 0 5px; }
 </style>
 
@@ -18,7 +18,7 @@ img { max-width: 300px; border-radius: 10px; }
 </head>
 <body>
 
-<h1>Buttons Debug Tracker 🐱</h1>
+<h1>Buttons Moth Tracker 🐱</h1>
 <img src="buttons.jpg" alt="Buttons the Cat">
 
 <div class="stats">
@@ -28,7 +28,10 @@ img { max-width: 300px; border-radius: 10px; }
   <p>Title: <span id="title">Novice Hunter</span></p>
 </div>
 
-<button id="addMothBtn" onclick="addMoth(event)" disabled>+1 Moth</button>
+<div>
+  <button id="addMothBtn" disabled>+1 Moth</button>
+  <button id="resetMothBtn" disabled>Reset Moths</button>
+</div>
 
 <div id="login" style="margin-top: 20px;">
   <input id="email" placeholder="Email">
@@ -75,6 +78,7 @@ onAuthStateChanged(auth, user => {
   console.log("Auth state changed. User:", user);
   isAdmin = !!user;
   document.getElementById("addMothBtn").disabled = !isAdmin;
+  document.getElementById("resetMothBtn").disabled = !isAdmin;
   document.getElementById("login").style.display = isAdmin ? "none" : "block";
 });
 
@@ -119,6 +123,30 @@ async function addMoth(event) {
   }
 }
 
+// Reset Moths
+async function resetMoths() {
+  if (!isAdmin) { console.log("Not admin, cannot reset moths."); return; }
+  try {
+    const snap = await getDoc(statsRef);
+    if (!snap.exists()) {
+      console.error("Document stats/buttons does not exist!");
+      alert("Firestore document missing!");
+      return;
+    }
+    state = snap.data();
+    state.mothCount = 0;
+    state.xp = 0;
+    state.level = 1;
+    state.hunts = [];
+    await updateDoc(statsRef, state);
+    console.log("Moth count reset! New state:", state);
+    render();
+  } catch (err) {
+    console.error("Failed to reset moths:", err);
+    alert("Error: " + err.message);
+  }
+}
+
 // Real-time updates
 onSnapshot(statsRef, snap => {
   if (snap.exists()) {
@@ -128,6 +156,14 @@ onSnapshot(statsRef, snap => {
     console.warn("Stats document does not exist!");
   }
 });
+
+// 🔹 Fix for module scripts: expose functions globally
+window.addMoth = addMoth;
+window.resetMoths = resetMoths;
+
+// Attach button click handlers via JS
+document.getElementById("addMothBtn").addEventListener("click", addMoth);
+document.getElementById("resetMothBtn").addEventListener("click", resetMoths);
 
 </script>
 </body>
