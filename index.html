@@ -18,7 +18,7 @@ body {
 }
 
 .frame {
-  background: #ffc0cb; /* Light pink for entire frame */
+  background: #ffe0ea; /* slightly lighter pink */
   border-radius: 15px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   padding: 20px;
@@ -27,11 +27,11 @@ body {
   max-width: 500px;
   text-align: center;
   color: black;
-  font-weight: bold; /* Bold font for everything inside */
+  font-weight: bold; 
 }
 
 .image-wrapper {
-  background: #ffc0cb; /* Light pink */
+  background: #ffe0ea;
   padding: 15px;
   border-radius: 15px;
   display: inline-block;
@@ -60,7 +60,7 @@ button {
   transition: all 0.2s ease; 
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   min-width: 120px;
-  font-weight: bold; /* Bold button text */
+  font-weight: bold;
 }
 button:disabled { 
   opacity: 0.5; 
@@ -74,15 +74,23 @@ button:disabled {
 #login input { padding: 8px; margin: 0 5px; border-radius: 5px; border: 1px solid #ccc; width: 40%; font-weight: bold; }
 #login button { padding: 8px 15px; border-radius: 5px; font-weight: bold; }
 
-/* Trophy Section Frame with more accented border */
+/* Trophy Section Frame with animated glowing yellow border */
 .trophies-frame {
-  background: linear-gradient(145deg, #fff, #f8f8ff);
+  background: #f0f0f0; /* light grey */
   border-radius: 15px;
   padding: 20px;
   margin-top: 30px;
-  border: 3px solid #ff69b4; /* bright pink border */
-  box-shadow: 0 8px 15px rgba(255, 105, 180, 0.4), 0 0 20px rgba(255, 105, 180, 0.6);
+  border: 4px solid #ffd700; /* yellow */
+  box-shadow: 0 0 15px #ffd700, 0 0 30px #fffacd;
+  animation: borderGlow 2s infinite alternate;
   overflow: hidden;
+  position: relative;
+}
+
+@keyframes borderGlow {
+  0% { box-shadow: 0 0 10px #ffd700, 0 0 20px #fffacd; }
+  50% { box-shadow: 0 0 20px #fffacd, 0 0 35px #ffd700; }
+  100% { box-shadow: 0 0 10px #ffd700, 0 0 20px #fffacd; }
 }
 
 .trophies-frame h2 { 
@@ -94,19 +102,23 @@ button:disabled {
 .trophies-frame ul {
   list-style: none;
   padding: 0;
-  display: inline-block; /* centers list */
+  display: inline-block; 
   columns: 2;
   column-gap: 20px;
-  text-align: left; /* left-align trophies in columns */
+  text-align: left;
   font-size: 16px;
   width: 100%;
   font-weight: bold;
+  position: relative;
+  z-index: 1;
 }
 
 .trophies-frame li {
   padding: 3px 0;
   display: block;
-  white-space: nowrap; /* prevent line breaks */
+  white-space: nowrap; 
+  position: relative;
+  z-index: 2;
 }
 
 .trophies-frame li.earned { 
@@ -116,12 +128,37 @@ button:disabled {
   animation: sparkleLoop 2s infinite;
 }
 
-/* Continuous sparkle animation */
+/* Continuous sparkle animation for earned trophies */
 @keyframes sparkleLoop {
   0%, 100% { transform: scale(1) rotate(0deg); text-shadow: 0 0 2px gold; }
   25% { transform: scale(1.05) rotate(2deg); text-shadow: 0 0 6px gold, 0 0 10px #fff; }
   50% { transform: scale(1.1) rotate(-2deg); text-shadow: 0 0 8px gold, 0 0 12px #fff; }
   75% { transform: scale(1.05) rotate(2deg); text-shadow: 0 0 6px gold, 0 0 10px #fff; }
+}
+
+.trophies-frame li.inactive { 
+  color: black; 
+}
+
+/* Glitter effect behind earned trophies */
+.trophies-frame li.earned::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: -2px;
+  width: 110%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(255,255,255,0.5) 10%, transparent 40%);
+  background-size: 10px 10px;
+  pointer-events: none;
+  z-index: 1;
+  animation: glitter 1.5s linear infinite;
+  border-radius: 5px;
+}
+
+@keyframes glitter {
+  0% { background-position: 0 0; }
+  100% { background-position: 20px 20px; }
 }
 
 /* Force 50th trophy to start in second column */
@@ -134,7 +171,7 @@ button:disabled {
 /* Mobile responsiveness */
 @media screen and (max-width: 480px) {
   .trophies-frame ul {
-    columns: 1; /* single column on small screens */
+    columns: 1; 
     column-gap: 0;
   }
   #login input {
@@ -191,7 +228,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, updateDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔹 Replace with your Firebase Web App values
+// 🔹 Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC1HnYKrEwO4uEF1VluSzHnr0EgOUYHhUs",
   authDomain: "buttons-moth-rpg.firebaseapp.com",
@@ -283,7 +320,7 @@ function renderTrophies() {
     const li = document.createElement("li");
     li.textContent = `${t.icon} ${t.trophy} (${t.count})`;
     if (state.mothCount >= t.count) li.classList.add("earned");
-    else li.style.color = "#aaa";
+    else li.classList.add("inactive");
     trophyList.appendChild(li);
   });
 }
